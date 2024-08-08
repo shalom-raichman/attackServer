@@ -14,7 +14,7 @@ namespace attackServer
         public Dictionary<string, int> origin {  get; set; }
         public Dictionary<string, int> angle { get; set; }
         public int time { get; set; }
-        public double demage { get; set; }
+        public double damage { get; set; }
 
         public string ToString()
         {

@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using WebSocketSharp.Server;
 
 namespace attackServer
 {
@@ -14,17 +15,33 @@ namespace attackServer
     {
         static async Task Main(string[] args)
         {
-            string filePath = "../../Mssiles";
+            //string filePath = "../../Mssiles";
 
-            List<Mssile> mssileList =  await GetJsonFileAsync(filePath);
+            //List<Mssile> mssileList =  await GetJsonFileAsync(filePath);
 
-            Console.WriteLine(mssileList.First().ToString());
+            //Console.WriteLine(mssileList.First().ToString());
 
-            Queue<Mssile> mssiles = new Queue<Mssile>();
-            foreach (Mssile mssile in mssiles)
-            {
-                mssiles.Enqueue(mssile);
-            }
+            //Queue<Mssile> mssiles = new Queue<Mssile>();
+            //foreach (Mssile mssile in mssiles)
+            //{
+            //    mssiles.Enqueue(mssile);
+            //}
+
+            Dictionary<string, int> damgeDict = new Dictionary<string, int>();
+
+            damgeDict["KSAAM"] = 100;
+            damgeDict["Qusaam"] = 150;
+            damgeDict["Pajar"] = 200;
+            damgeDict["Grade"] = 300;
+            damgeDict["Qtusha"] = 700;
+            
+
+            WebSocketServer wss = new WebSocketServer("ws://localhost:3108");
+            wss.AddWebSocketService<MissileHandler>("/MissileHandler", () => new MissileHandler(wss));
+            wss.Start();
+            Console.WriteLine("Backend server is running. Press Enter to exit...");
+            Console.ReadLine();
+            wss.Stop();
 
         }
 
