@@ -121,12 +121,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Department.cs" />
-    <Compile Include="IronDom.cs" />
-    <Compile Include="Missilehandler.cs" />
-    <Compile Include="Mssile.cs" />
+    <Compile Include="DefenceManeger.cs" />
+    <Compile Include="IronDome.cs" />
+    <Compile Include="MissileHandler.cs" />
+    <Compile Include="Missile.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QueueManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

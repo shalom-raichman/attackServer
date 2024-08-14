@@ -14,31 +14,37 @@ namespace attackServer
 
     public class MissileHandler : WebSocketBehavior
     {
-        Queue<Mssile> _missileQueue = new Queue<Mssile>();
-        
+
+
         private readonly WebSocketServer _wss;
-        public MissileHandler(WebSocketServer wss)
+        private readonly ConcurrentQueue<Missile> _missileQueue;
+
+        internal MissileHandler(WebSocketServer wss, ConcurrentQueue<Missile> missileQueue)
         {
-            _wss = wss;
+            this._wss = wss;
+            this._missileQueue = missileQueue;
         }
-        protected override void OnMessage(MessageEventArgs e)
+
+
+        protected override async void OnMessage(MessageEventArgs e)
         {
-            Console.WriteLine("data got is: " + e.Data);
+            //Console.WriteLine("data got is: " + e.Data);
 
-            Mssile mssile = new Mssile();
+            Missile missile = JsonSerializer.Deserialize<Missile>(e.Data);
+            
+            Console.WriteLine("*************************************");
+            
+            Console.WriteLine($"Missile -- {missile.name} -- hes been detected ");
 
-            Mssile missile =  JsonSerializer.Deserialize<Mssile>(e.Data);
+            this._missileQueue.Enqueue(missile);
 
-            _missileQueue.Enqueue(missile);
+            //Task task = new Task(IronDom.Defens(_missileQueue));
 
-            IronDom.Defens(_missileQueue);
+        }
 
+        public void BroadcastStatus(string message)
+        {
+            this._wss.WebSocketServices["/MissileHandler"].Sessions.Broadcast(message);
         }
     }
 }
-
-
-
-
-
-

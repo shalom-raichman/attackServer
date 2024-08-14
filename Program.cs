@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,8 +14,47 @@ namespace attackServer
 {
     internal class Program
     {
+
+        // queue maneger
+        // queue<Missile>
+        // missile handler - enqueue the missile
+        // iron dome
+        // Missile class
+
         static async Task Main(string[] args)
         {
+
+            ConcurrentQueue<Missile> missileQueue = new ConcurrentQueue<Missile>();
+
+            Dictionary<string, int> damgeDict = new Dictionary<string, int>();
+
+            damgeDict["KSAAM"] = 100;
+            damgeDict["Qusaam"] = 150;
+            damgeDict["Pajar"] = 200;
+            damgeDict["Grade"] = 300;
+            damgeDict["Qtusha"] = 700;
+
+            string port = "3108";
+
+            WebSocketServer wss = new WebSocketServer($"ws://localhost:{port}");
+
+            wss.AddWebSocketService<MissileHandler>("/MissileHanlder", () => new MissileHandler(wss, missileQueue));
+
+            QueueManager manager = new QueueManager(missileQueue , wss);
+
+            manager.Start();
+
+            wss.Start();
+            
+            //await DefenceManeger.RunIronDom();
+            
+            Console.WriteLine($"Web Socket server is listening on port: {port}...");
+            
+            Console.ReadLine();
+            
+            wss.Stop();
+
+
             //string filePath = "../../Mssiles";
 
             //List<Mssile> mssileList =  await GetJsonFileAsync(filePath);
@@ -26,23 +66,6 @@ namespace attackServer
             //{
             //    mssiles.Enqueue(mssile);
             //}
-
-            Dictionary<string, int> damgeDict = new Dictionary<string, int>();
-
-            damgeDict["KSAAM"] = 100;
-            damgeDict["Qusaam"] = 150;
-            damgeDict["Pajar"] = 200;
-            damgeDict["Grade"] = 300;
-            damgeDict["Qtusha"] = 700;
-            
-
-            WebSocketServer wss = new WebSocketServer("ws://localhost:3108");
-            wss.AddWebSocketService<MissileHandler>("/MissileHandler", () => new MissileHandler(wss));
-            wss.Start();
-            Console.WriteLine("Backend server is running. Press Enter to exit...");
-            Console.ReadLine();
-            wss.Stop();
-
         }
 
 
@@ -64,7 +87,7 @@ namespace attackServer
             return result;
         }
         
-        public static async Task<List<Mssile>> GetJsonFileAsync(string filePath)
+        public static async Task<List<Missile>> GetJsonFileAsync(string filePath)
         {
             string fileName = "../../Mssiles.json";
             
@@ -73,8 +96,8 @@ namespace attackServer
 
 
             FileStream openStream = File.OpenRead(fileName);
-            List<Mssile> mssiles =
-                await JsonSerializer.DeserializeAsync<List<Mssile>>(openStream);
+            List<Missile> mssiles =
+                await JsonSerializer.DeserializeAsync<List<Missile>>(openStream);
 
 
             return mssiles;
